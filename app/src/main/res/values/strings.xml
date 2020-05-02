@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">PoliceApp</string>
+
+    <string name="click_here_to_login">Already have an account?\n<u><b>Click here</b></u> to Sign In</string>
+    <string name="click_here_to_signin">New here?\n<u><b>Click here</b></u> to Register</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+
+    <string name="sign_out">Sign Out</string>
+    <string name="fir_form">File an FIR</string>
+
+    <string name="enter_your_name">Enter your name</string>
+    <string name="enter_your_gmail">Enter your gmail account</string>
+    <string name="enter_your_station_id">Enter your station id</string>
+    <string name="enter_your_password">Enter your password</string>
+
+    <!-- FIR Form -->
+    <string name="first_information_report">First Information Report</string>
+    <string name="first_information_report_subtitle">(Under Section 154 Cr.P.C.)</string>
+    <string name="submit">Submit</string>
+
+    <!-- Complaint / Informant -->
+    <string name="fir_complainant_title">6. Complainant / Informant :</string>
+    <string name="fir_complainant_name">Complainant\'s / Informant\'s name</string>
+    <string name="fir_complainant_father_name">Father\'s or Husband\'s name</string>
+    <string name="fir_complainant_dob">Date / Year of Birth</string>
+    <string name="fir_complainant_nationality">Nationality</string>
+    <string name="fir_complainant_address">Address</string>
+
+    <!-- Complaint / Informant Signature -->
+    <string name="fir_complainant_signature">Signature of the\nComplainant / Informant</string>
+    <string name="clear_signature">Clear</string>
+</resources>
