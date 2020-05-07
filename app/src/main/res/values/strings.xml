@@ -19,8 +19,8 @@
     <string name="first_information_report_subtitle">(Under Section 154 Cr.P.C.)</string>
     <string name="submit">Submit</string>
 
-    <!-- Complaint / Informant -->
-    <string name="fir_complainant_title">6. Complainant / Informant :</string>
+    <!-- Fragment 1 -->
+    <string name="fir_complainant_title">1. Complainant / Informant :</string>
     <string name="fir_complainant_name">Complainant\'s / Informant\'s name</string>
     <string name="fir_complainant_father_name">Father\'s or Husband\'s name</string>
     <string name="fir_complainant_dob">Date / Year of Birth</string>
@@ -30,4 +30,14 @@
     <!-- Complaint / Informant Signature -->
     <string name="fir_complainant_signature">Signature of the\nComplainant / Informant</string>
     <string name="clear_signature">Clear</string>
+
+    <!-- Fragment -->
+    <string name="change_fragment">Change Fragment</string>
+
+    <!-- Fragment 2 -->
+    <string name="complaint_text">2. Complaint</string>
+    <string name="fir_complainant">Enter your complaint here …</string>
+    <string name="save">Save</string>
+    <string name="left_button">Left Button</string>
+    <string name="right_button">Right Button</string>
 </resources>

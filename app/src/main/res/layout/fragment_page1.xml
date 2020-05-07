@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    tools:context=".FragmentPage1">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fir_complainant_title"
+                android:layout_marginStart="24dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                />
+
+            <EditText
+                android:id="@+id/complainantName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:hint="@string/fir_complainant_name"
+                android:inputType="textPersonName"
+                android:importantForAutofill="no"
+                />
+
+            <EditText
+                android:id="@+id/complainantFatherName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:hint="@string/fir_complainant_father_name"
+                android:inputType="textPersonName"
+                android:importantForAutofill="no"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <EditText
+                    android:id="@+id/complainantDOB"
+                    android:layout_weight="3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:hint="@string/fir_complainant_dob"
+                    android:inputType="text"
+                    android:importantForAutofill="no"
+                    />
+
+                <EditText
+                    android:id="@+id/complainantNationality"
+                    android:layout_weight="2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:hint="@string/fir_complainant_nationality"
+                    android:inputType="text"
+                    android:importantForAutofill="no"
+                    />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/complainantAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:hint="@string/fir_complainant_address"
+                android:inputType="textMultiLine"
+                android:importantForAutofill="no"
+                android:maxLines="2"
+                />
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="@string/save"
+                android:layout_marginEnd="12dp"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

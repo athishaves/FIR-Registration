@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -45,9 +48,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class FirForm extends AppCompatActivity {
-
-    EditText cName, cFatherName, cDOB, cNationality, cAddress;
+public class FirForm
+        extends AppCompatActivity
+        implements FragmentPage2.FragmentPage2Listener, FragmentPage1.FragmentPage1Listener {
 
     PaintView paintView;
 
@@ -58,6 +61,13 @@ public class FirForm extends AppCompatActivity {
     String psDistName, psPoliceStationName;
 
     ProgressDialog progressDialog;
+
+    int count;
+
+    Fragment fragmentPage1, fragmentPage2;
+
+    String cName, cFatherName, cDOB, cNationality, cAddress;
+    String cComplaint;
 
 
     @Override
@@ -119,7 +129,6 @@ public class FirForm extends AppCompatActivity {
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -146,11 +155,17 @@ public class FirForm extends AppCompatActivity {
         psDist = findViewById(R.id.psDistrict);
         psPoliceStation = findViewById(R.id.psPoliceStation);
 
-        cName = findViewById(R.id.complainantName);
-        cFatherName = findViewById(R.id.complainantFatherName);
-        cDOB = findViewById(R.id.complainantDOB);
-        cNationality = findViewById(R.id.complainantNationality);
-        cAddress = findViewById(R.id.complainantAddress);
+        fragmentPage1 = new FragmentPage1();
+        fragmentPage2 = new FragmentPage2();
+
+        count = 1000;
+
+        cName = "";
+        cFatherName = "";
+        cDOB = "";
+        cNationality = "";
+        cAddress = "";
+        cComplaint = "";
     }
 
     public void createPDF(View view) {
@@ -194,43 +209,43 @@ public class FirForm extends AppCompatActivity {
         canvas.drawText(String.valueOf(complaintNumber), (float) 9*pageWidth/10, 200, paint);
 
 
-        Log.i("Button", "Here");
-
         // 1. Station Info
         paint.setColor(Color.BLACK);
-        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(30f);
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String date = dateFormat.format(c);
-        String psInfo = "1. " + "Dist : " + psDistName + "    " + "P.S : " + psPoliceStationName + "    " + "Date : " + date;
-        canvas.drawText(psInfo, margin-5, 250, paint);
+        String psInfo = "Dist : " + psDistName + "    " + "P.S : " + psPoliceStationName + "    " + "Date : " + date;
+        canvas.drawText(psInfo, (float) pageWidth/2, 250, paint);
 
 
 
         // 6. Complainant's Title
+        paint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText(getString(R.string.fir_complainant_title), margin - 5, 305, paint);
 
 
         // 6. Complainant's Details
         int x = margin, y = 310;
-        String string = "(a) Name : " + cName.getText().toString() + "\n"
-                + "(b) Father's / Husband's Name : " + cFatherName.getText().toString() + "\n"
-                + "(c) Date / Year of Birth : " + cDOB.getText().toString();
+        String string = "(a) Name : " + cName + "\n"
+                + "(b) Father's / Husband's Name : " + cFatherName + "\n"
+                + "(c) Date / Year of Birth : " + cDOB;
         for (String line : string.split("\n")) {
             y += paint.descent() - paint.ascent() + linespace;
             canvas.drawText(line, x, y, paint);
         }
 
         paint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText("(d) Nationality : " + cNationality.getText().toString(), pageWidth - x, y, paint);
+        canvas.drawText("(d) Nationality : " + cNationality, pageWidth - x, y, paint);
 
         paint.setTextAlign(Paint.Align.LEFT);
-        for (String line : ("(e) Address : " + cAddress.getText().toString()).split("\n")) {
+        for (String line : ("(e) Address : " + cAddress).split("\n")) {
             y += paint.descent() - paint.ascent() + linespace;
             canvas.drawText(line, x, y, paint);
             x += 100;
         }
+
 
 
         // Signature Image Part
@@ -261,7 +276,8 @@ public class FirForm extends AppCompatActivity {
         y = pageHeight - 100 - margin;
         paint.setTextSize(25f);
 
-        canvas.drawText("(" + cName.getText() + ")", x, y-10, paint);
+
+        canvas.drawText("(" + cName + ")", x, y-10, paint);
 
         for (String line : getString(R.string.fir_complainant_signature).split("\n")) {
             y += paint.descent() - paint.ascent() + linespace;
@@ -306,6 +322,7 @@ public class FirForm extends AppCompatActivity {
         this.startActivity(Intent.createChooser(share, "Choose a file to open PDF"));
     }
 
+
     private void callAToast(String a) {
         Toast.makeText(this, a, Toast.LENGTH_SHORT).show();
     }
@@ -318,6 +335,55 @@ public class FirForm extends AppCompatActivity {
 
     public void ClearSignature(View view) {
         paintView.clearCanvas();
+    }
+
+
+    public void ChangeFragment(View view) {
+
+        if (view.getTag().toString().equals("0")) {
+            count--;
+        } else if (view.getTag().toString().equals("1")) {
+            count++;
+        }
+
+        if (count<0) {
+            count = 1000;
+            return;
+        }
+
+        Fragment fragment;
+        if (count%2==0) {
+            fragment = fragmentPage1;
+        } else {
+            fragment = fragmentPage2;
+
+        }
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fir_fragment, fragment)
+                .commit();
+
+    }
+
+    @Override
+    public void sendPage2(String complaint) {
+        cComplaint = complaint;
+        Log.i("Complaint", "Complaint from Fragment " + complaint);
+    }
+
+    @Override
+    public void sendPage1(String name, String fatherName, String DOB, String nationality, String address) {
+        cName = name;
+        cFatherName = fatherName;
+        cDOB = DOB;
+        cNationality = nationality;
+        cAddress = address;
+        Log.i("Complaint", "Complaint from Fragment \n" +
+                cName + "\n" +
+                cFatherName + "\n" +
+                cDOB + "\n" +
+                cNationality + "\n" +
+                cAddress + "\n");
     }
 
 }
