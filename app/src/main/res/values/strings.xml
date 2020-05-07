@@ -33,11 +33,12 @@
 
     <!-- Fragment -->
     <string name="change_fragment">Change Fragment</string>
-
-    <!-- Fragment 2 -->
-    <string name="complaint_text">2. Complaint</string>
-    <string name="fir_complainant">Enter your complaint here …</string>
-    <string name="save">Save</string>
     <string name="left_button">Left Button</string>
     <string name="right_button">Right Button</string>
+
+    <!-- Fragment 2 -->
+    <string name="complaint_text">2. Complaint :</string>
+    <string name="fir_complainant">Enter your complaint here …</string>
+    <string name="save">Save</string>
+
 </resources>

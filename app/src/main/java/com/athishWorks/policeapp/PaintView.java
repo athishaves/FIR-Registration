@@ -43,8 +43,8 @@ public class PaintView extends View {
     }
 
     public void initialise (DisplayMetrics displayMetrics) {
-        int height = displayMetrics.heightPixels/5;
-        int width = 9*displayMetrics.widthPixels/10;
+        int height = 15*displayMetrics.heightPixels/100;
+        int width = 98*displayMetrics.widthPixels/100;
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
     }

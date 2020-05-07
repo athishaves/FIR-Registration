@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,13 +41,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class FirForm
         extends AppCompatActivity
@@ -121,11 +131,20 @@ public class FirForm
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         ViewGroup.LayoutParams params = paintView.getLayoutParams();
-        params.width = screenWidth = 9*displayMetrics.widthPixels/10;
-        params.height = screenHeight = displayMetrics.heightPixels/5;
+        params.width = screenWidth = 98*displayMetrics.widthPixels/100;
+        params.height = screenHeight = 15*displayMetrics.heightPixels/100;
 
         paintView.setLayoutParams(params);
         paintView.initialise(displayMetrics);
+
+
+        FrameLayout f = findViewById(R.id.paintFrameLayout);
+        params = f.getLayoutParams();
+        params.width = displayMetrics.widthPixels;
+        params.height = 16*displayMetrics.heightPixels/100;
+        f.setLayoutParams(params);
+
+        defaultFragment();
 
     }
 
@@ -175,9 +194,13 @@ public class FirForm
         int pageWidth = 1000, pageHeight = 1500;
         int margin = 25;
         int linespace = 5;
+        SharedPreferences preferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        int complaintNumber = preferences.getInt("ComplaintNumber", 7500);
 
         ProgressDialog progressDialog = new ProgressDialog(FirForm.this);
         progressDialog.show();
+
 
         PdfDocument pdfDocument = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
@@ -199,13 +222,10 @@ public class FirForm
 
         // Complaint Number
         paint.setTypeface(Typeface.DEFAULT);
-        SharedPreferences preferences = getSharedPreferences("SharedPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
 
         paint.setTextSize(30f);
         paint.setTextAlign(Paint.Align.RIGHT);
         paint.setColor(Color.RED);
-        int complaintNumber = preferences.getInt("ComplaintNumber", 7500);
         canvas.drawText(String.valueOf(complaintNumber), (float) 9*pageWidth/10, 200, paint);
 
 
@@ -214,7 +234,7 @@ public class FirForm
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(30f);
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
         String date = dateFormat.format(c);
         String psInfo = "Dist : " + psDistName + "    " + "P.S : " + psPoliceStationName + "    " + "Date : " + date;
         canvas.drawText(psInfo, (float) pageWidth/2, 250, paint);
@@ -223,11 +243,11 @@ public class FirForm
 
         // 6. Complainant's Title
         paint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText(getString(R.string.fir_complainant_title), margin - 5, 305, paint);
+        canvas.drawText(getString(R.string.fir_complainant_title), margin - 5, 310, paint);
 
 
         // 6. Complainant's Details
-        int x = margin, y = 310;
+        int x = margin, y = 315;
         String string = "(a) Name : " + cName + "\n"
                 + "(b) Father's / Husband's Name : " + cFatherName + "\n"
                 + "(c) Date / Year of Birth : " + cDOB;
@@ -247,6 +267,18 @@ public class FirForm
         }
 
 
+        // 2. Complaint Title
+        y += paint.descent() - paint.ascent() + linespace + 10;
+        canvas.drawText(getString(R.string.complaint_text), margin - 5, y, paint);
+
+        // Complaint
+        x = margin+5;
+        for (String line : cComplaint.split("\n")) {
+            y += paint.descent() - paint.ascent() + linespace;
+            canvas.drawText(line, x, y, paint);
+        }
+
+
 
         // Signature Image Part
 
@@ -258,7 +290,7 @@ public class FirForm
             Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
             bitmap = Bitmap.createScaledBitmap(bitmap, 200, 100, true);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawBitmap(bitmap, 65, pageHeight - 250, paint);
+            canvas.drawBitmap(bitmap, 65, pageHeight - 260, paint);
 
             if (!(new File(filePath).delete())) {
                 callAToast("Signature file isn't deleted");
@@ -309,9 +341,13 @@ public class FirForm
         editor.apply();
         callAToast("FIR Registered");
 
+
         if (!file.exists()) {
             return;
         }
+
+
+
         Uri uri = FileProvider.getUriForFile(this,
                 getApplicationContext().getPackageName() + ".provider", file);
         Intent share = new Intent();
@@ -321,6 +357,7 @@ public class FirForm
         share.putExtra(Intent.EXTRA_STREAM, uri);
         this.startActivity(Intent.createChooser(share, "Choose a file to open PDF"));
     }
+
 
 
     private void callAToast(String a) {
@@ -363,6 +400,13 @@ public class FirForm
                 .replace(R.id.fir_fragment, fragment)
                 .commit();
 
+    }
+
+    private void defaultFragment() {
+        Fragment fragment = fragmentPage1;
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fir_fragment, fragment)
+                .commit();
     }
 
     @Override
