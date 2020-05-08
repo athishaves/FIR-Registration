@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -30,7 +28,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,16 +38,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -79,6 +72,12 @@ public class FirForm
     String cName, cFatherName, cDOB, cNationality, cAddress;
     String cComplaint;
 
+    public native String pdfPassword();
+
+    static {
+        System.loadLibrary("ndktest");
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +92,10 @@ public class FirForm
         cDeclarations();
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Keys");
-        String user = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        ref.child(user.substring(0, user.indexOf("@"))).addValueEventListener(new ValueEventListener() {
+        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        ref.child(user).addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String a;
@@ -117,7 +118,8 @@ public class FirForm
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                callAToast(databaseError.getMessage());
+                progressDialog.dismiss();
             }
         });
 
@@ -188,6 +190,11 @@ public class FirForm
     }
 
     public void createPDF(View view) {
+
+        if (psDist.getText()=="") {
+            callAToast("You are not authorized");
+            return;
+        }
 
         SaveSignature();
 
@@ -343,9 +350,26 @@ public class FirForm
 
 
         if (!file.exists()) {
+            callAToast("Pdf is not created");
             return;
         }
 
+
+        createEncryptedPDF(complaintNumber);
+
+        String encFilePath = Environment.getExternalStorageDirectory().getPath() +
+                "/FIR/" + "FIR" + complaintNumber + "ENC" + ".pdf";
+        file = new File(encFilePath);
+
+        if (!file.exists()) {
+            callAToast("Pdf is not protected");
+            return;
+        }
+
+
+        if (!(new File(filePath).delete())) {
+            callAToast("Unprotected pdf is not deleted");
+        }
 
 
         Uri uri = FileProvider.getUriForFile(this,
@@ -356,6 +380,29 @@ public class FirForm
         share.setType("application/pdf");
         share.putExtra(Intent.EXTRA_STREAM, uri);
         this.startActivity(Intent.createChooser(share, "Choose a file to open PDF"));
+    }
+
+
+    public void createEncryptedPDF(int complaintNumber) {
+        String source = Environment.getExternalStorageDirectory().getPath() + "/FIR/" + "FIR" + complaintNumber + ".pdf";
+        String dest = Environment.getExternalStorageDirectory().getPath() + "/FIR/" + "FIR" + complaintNumber + "ENC" + ".pdf";
+        String PASSWORD = pdfPassword();
+
+        try {
+            PdfReader reader = new PdfReader(source);
+            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
+            stamper.setEncryption(PASSWORD.getBytes(),
+                    PASSWORD.getBytes(),
+                    PdfWriter.ALLOW_PRINTING,
+                    PdfWriter.ENCRYPTION_AES_128|PdfWriter.DO_NOT_ENCRYPT_METADATA);
+            stamper.close();
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
